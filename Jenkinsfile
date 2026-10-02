@@ -4,6 +4,15 @@ pipeline {
         label 'java'
     }
 
+    parameters {
+        string(
+            name: 'DOCKER_IMAGE',
+            defaultValue: 'jenkins-java-demo:1.0',
+            description: 'Enter the Docker image name and tag, for example:
+            jenkins-java-demo:1.0'
+        )
+    }
+
     options {
         timestamps()
     }
@@ -13,6 +22,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 echo 'Checking out source code...'
+                checkout scm
             }
         }
 
@@ -20,8 +30,8 @@ pipeline {
             steps {
                 echo 'Building the Java application...'
                 sh '''
-                 java --version
-
+                    java --version
+                    mvn clean package -DskipTests
                 '''
             }
         }
@@ -30,16 +40,18 @@ pipeline {
             steps {
                 echo 'Running tests...'
                 sh '''
-                  mvn --version
+                    mvn test
                 '''
             }
         }
 
         stage('Build image') {
             steps {
-                echo 'Building Docker image...'
+                echo "Building Docker image: ${params.DOCKER_IMAGE}"
+
                 sh '''
-                docker --version
+                    docker --version
+                    docker build -t "$DOCKER_IMAGE" .
                 '''
             }
         }
@@ -47,13 +59,13 @@ pipeline {
         stage('Archive') {
             steps {
                 echo 'Archiving JAR file...'
-
+                archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
             }
         }
 
         stage('Deploy stage') {
             steps {
-                echo 'Deploying application...'
+                echo "Deploying ${params.DOCKER_IMAGE}..."
             }
         }
     }
