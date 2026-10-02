@@ -10,4 +10,6 @@ RUN apt-get update \
         docker.io \
     && rm -rf /var/lib/apt/lists/*
 
+RUN usermod -aG root jenkins
+
 USER jenkins
