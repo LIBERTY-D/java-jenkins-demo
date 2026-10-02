@@ -8,8 +8,8 @@ pipeline {
         string(
             name: 'DOCKER_IMAGE',
             defaultValue: 'jenkins-java-demo:1.0',
-            description: 'Enter the Docker image name and tag, for example:
-            jenkins-java-demo:1.0'
+            description: '''Enter the Docker image name and tag, for example:
+            jenkins-java-demo:1.0'''
         )
     }
 
